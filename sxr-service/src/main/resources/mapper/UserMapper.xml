@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="per.sxr.sxr.service.mapper.UserMapper">
+  <resultMap id="BaseResultMap" type="per.sxr.sxr.service.domain.User">
+    <id column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+    <result column="update_time" jdbcType="DATE" property="updateTime" />
+    <result column="operator" jdbcType="VARCHAR" property="operator" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    user_id, name, address, create_time, update_time, operator
+  </sql>
+
+
+  <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sxr_user
+    where user_id = #{userId,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectByIdList" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sxr_user
+    where user_id in
+    <foreach collection="list" item="user" open="(" separator="," close=")">
+      #{userId,jdbcType=BIGINT}
+    </foreach>
+  </select>
+
+
+  <delete id="deleteById" parameterType="java.lang.Long">
+    delete from sxr_user
+    where user_id = #{userId,jdbcType=BIGINT}
+  </delete>
+
+
+  <insert id="insert" parameterType="per.sxr.sxr.service.domain.User">
+    insert into sxr_user (user_id, name, address, 
+      create_time, update_time, operator
+      )
+    values (#{userId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
+      now(), null, #{operator,jdbcType=VARCHAR}
+      )
+  </insert>
+
+
+  <insert id="batchInsert" parameterType="per.sxr.sxr.service.domain.User">
+    insert into sxr_user
+    (<include refid="Base_Column_List" />)
+    values
+    <foreach collection="list" item="user" open="(" separator="," close=")">
+      (
+       #{user.userId},
+       #{user.name},
+       #{user.address},
+       now(),
+       null,
+       #{user.operator}
+      )
+    </foreach>
+  </insert>
+
+
+
+
+  <update id="updateByCondition" parameterType="per.sxr.sxr.service.domain.User">
+    update sxr_user
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=DATE},
+      </if>
+      <if test="operator != null">
+        operator = #{operator,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateById" parameterType="per.sxr.sxr.service.domain.User">
+    update sxr_user
+    set name = #{name,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      update_time = now(),
+      operator = #{operator,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+</mapper>
